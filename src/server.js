@@ -8,16 +8,10 @@ import blogPostsRouter from "./services/blogPosts/blogPosts.js";
 const server = express();
 const port = process.env.PORT || 3001;
 
-// *************************************** MIDDLEWARES ***************************************
-
 server.use(cors());
 server.use(express.json());
 
-// *************************************** ENDPOINTS *****************************************
-
 server.use("/blogPosts", blogPostsRouter);
-
-// ************************************** ERROR HANDLERS *************************************
 
 mongoose.connect(process.env.MONGO_CONNECTION);
 

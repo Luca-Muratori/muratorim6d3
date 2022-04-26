@@ -49,8 +49,6 @@ blogPostsRouter.put("/:blogPostId", async (req, res, next) => {
       // by default validation is off here, if you want to have it --> runValidators: true
     );
 
-    // ********************************* ALTERNATIVE METHOD ***************************************
-
     // const blogPost = await BlogPostsModel.findById(req.params.blogPostId)
 
     // blogPost.firstName = "John"
