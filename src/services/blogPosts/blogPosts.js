@@ -2,6 +2,7 @@ import express from "express";
 import createError from "http-errors";
 import BlogPostsModel from "./model.js";
 import CommentModel from "../comments/model.js";
+import q2m from "query-to-mongo";
 
 const blogPostsRouter = express.Router();
 
@@ -18,8 +19,26 @@ blogPostsRouter.post("/", async (req, res, next) => {
 
 blogPostsRouter.get("/", async (req, res, next) => {
   try {
-    const blogPosts = await BlogPostsModel.find();
-    res.send(blogPosts);
+    if (!req.query) {
+      const blogPosts = await BlogPostsModel.find();
+      res.send(blogPosts);
+    } else {
+      const mongoQuery = q2m(req.query);
+      const total = await BlogPostsModel.countDocuments(mongoQuery.criteria);
+      const blogPost = await BlogPostsModel.find(
+        mongoQuery.criteria,
+        mongoQuery.options.fields
+      )
+        .sort(mongoQuery.options.sort)
+        .skip(mongoQuery.options.skip)
+        .limit(mongoQuery.options.limit);
+      res.send({
+        links: mongoQuery.links("http://localhost:3001/blogPosts", total),
+        totalPages: Math.ceil(total / mongoQuery.options.limit),
+        total,
+        blogPost,
+      });
+    }
   } catch (error) {
     next(error);
   }
@@ -193,7 +212,6 @@ blogPostsRouter.delete(
       );
 
       if (modifiedBlogPost) {
-        console.log(modifiedBlogPost);
         res.send(modifiedBlogPost);
       } else {
         next(createError(404, "blogPost not found"));
