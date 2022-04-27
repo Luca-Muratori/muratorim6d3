@@ -88,10 +88,8 @@ blogPostsRouter.delete("/:blogPostId", async (req, res, next) => {
 //-----------------------------------------------Add the comment CRUD endpoints
 blogPostsRouter.post("/:blogPostId/comment", async (req, res, next) => {
   try {
-    //find the blogPost
     const BlogPost = await BlogPostsModel.findById(req.params.blogPostId);
     if (BlogPost) {
-      //if blogPost if found add the date new comment
       const commentToInsert = await CommentModel(req.body);
 
       const modifiedBlogPost = await BlogPostsModel.findByIdAndUpdate(
@@ -164,9 +162,8 @@ blogPostsRouter.put(
           (comment) => comment._id.toString() === req.params.commentId
         );
         if (index !== -1) {
-          console.log(blogPost.comments[index]);
           blogPost.comments[index] = {
-            ...blogPost.comments[index].toObject(),
+            ...blogPost.comments[index],
             ...req.body,
           };
           await blogPost.save();
@@ -196,6 +193,7 @@ blogPostsRouter.delete(
       );
 
       if (modifiedBlogPost) {
+        console.log(modifiedBlogPost);
         res.send(modifiedBlogPost);
       } else {
         next(createError(404, "blogPost not found"));
