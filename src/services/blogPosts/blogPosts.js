@@ -30,8 +30,8 @@ blogPostsRouter.get("/", async (req, res, next) => {
         mongoQuery.options.fields
       )
         .sort(mongoQuery.options.sort)
-        .skip(mongoQuery.options.skip)
-        .limit(mongoQuery.options.limit);
+        .skip(mongoQuery.options.skip || 0)
+        .limit(mongoQuery.options.limit || 0);
       res.send({
         links: mongoQuery.links("http://localhost:3001/blogPosts", total),
         totalPages: Math.ceil(total / mongoQuery.options.limit),
