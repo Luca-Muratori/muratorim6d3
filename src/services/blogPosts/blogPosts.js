@@ -24,19 +24,25 @@ blogPostsRouter.get("/", async (req, res, next) => {
       res.send(blogPosts);
     } else {
       const mongoQuery = q2m(req.query);
-      const total = await BlogPostsModel.countDocuments(mongoQuery.criteria);
-      const blogPost = await BlogPostsModel.find(
-        mongoQuery.criteria,
-        mongoQuery.options.fields
-      )
-        .sort(mongoQuery.options.sort)
-        .skip(mongoQuery.options.skip || 0)
-        .limit(mongoQuery.options.limit || 0);
+      // const total = await BlogPostsModel.countDocuments(mongoQuery.criteria);
+      // const blogPost = await BlogPostsModel.find(
+      //   mongoQuery.criteria,
+      //   mongoQuery.options.fields
+      // )
+      //   .sort(mongoQuery.options.sort)
+      //   .skip(mongoQuery.options.skip || 0)
+      //   .limit(mongoQuery.options.limit || 0);
+
+      //here I use the custom method declared in the model.js file
+      const { total, blogPosts } = await BlogPostsModel.findBlogPostWithAuthor(
+        mongoQuery
+      );
+
       res.send({
         links: mongoQuery.links("http://localhost:3001/blogPosts", total),
         totalPages: Math.ceil(total / mongoQuery.options.limit),
         total,
-        blogPost,
+        blogPosts,
       });
     }
   } catch (error) {

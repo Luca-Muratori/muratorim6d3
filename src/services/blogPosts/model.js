@@ -11,20 +11,27 @@ const blogPostsSchema = new Schema(
       value: { type: Number, required: true },
       unit: { type: String, required: true },
     },
-    author: {
-      name: { type: String, required: true },
-      avatar: { type: String, required: true },
-    },
+    authors: [{ type: Schema.Types.ObjectId, ref: "Author" }],
     content: { type: String, required: true },
-    comments: [
-      {
-        comment_title: String,
-        comment_text: String,
-        comment_user_name: String,
-      },
-    ],
+    comments: [{ type: Schema.Types.ObjectId, ref: "Comment" }],
   },
   { timestamps: true } // adds and manages automatically createdAt and updatedAt fields
 );
+
+//---------------------custom methods--------------------
+
+blogPostsSchema.static("findBlogPostWithAuthor", async function (mongoQuery) {
+  const total = await this.countDocuments(mongoQuery.criteria);
+
+  const blogPosts = await this.find(
+    mongoQuery.criteria,
+    mongoQuery.options.fields
+  )
+    .skip(mongoQuery.options.skip)
+    .limit(mongoQuery.options.limit)
+    .sort(mongoQuery.options.sort)
+    .populate({ path: "authors", select: "first_name last_name" });
+  return { total, blogPosts };
+});
 
 export default model("BlogPost", blogPostsSchema);
