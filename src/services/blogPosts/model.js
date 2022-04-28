@@ -22,7 +22,6 @@ const blogPostsSchema = new Schema(
 
 blogPostsSchema.static("findBlogPostWithAuthor", async function (mongoQuery) {
   const total = await this.countDocuments(mongoQuery.criteria);
-
   const blogPosts = await this.find(
     mongoQuery.criteria,
     mongoQuery.options.fields

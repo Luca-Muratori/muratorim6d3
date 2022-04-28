@@ -8,9 +8,9 @@ const blogPostsRouter = express.Router();
 
 blogPostsRouter.post("/", async (req, res, next) => {
   try {
-    const newBlogPost = new BlogPostsModel(req.body); // here it happens the validation of req.body, if it is not ok Mongoose will throw an error (if it is ok it is NOT saved in db yet)
+    const newBlogPost = new BlogPostsModel(req.body);
 
-    const { _id } = await newBlogPost.save(); // --> {_id: 123io12j3oi21j, firstName: "aoidjoasijdo"}
+    const { _id } = await newBlogPost.save();
     res.status(201).send({ _id });
   } catch (error) {
     next(error);
@@ -52,7 +52,9 @@ blogPostsRouter.get("/", async (req, res, next) => {
 
 blogPostsRouter.get("/:blogPostId", async (req, res, next) => {
   try {
-    const blogPosts = await BlogPostsModel.findById(req.params.blogPostId);
+    const blogPosts = await BlogPostsModel.findById(
+      req.params.blogPostId
+    ).populate({ path: "authors", select: "first_name last_name" });
 
     if (blogPosts) {
       res.send(blogPosts);

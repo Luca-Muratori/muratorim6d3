@@ -14,11 +14,7 @@ server.use(cors());
 server.use(express.json());
 
 server.use("/blogPosts", blogPostsRouter);
-
-//authors of blog posts, one user to many blog posts
 server.use("/authors", authorsRouter);
-
-//users
 server.use("/users", usersRouter);
 
 mongoose.connect(process.env.MONGO_CONNECTION);
